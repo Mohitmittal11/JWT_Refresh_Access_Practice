@@ -1,22 +1,20 @@
 const mongoose = require("mongoose");
-const userSchema = new mongoose.Schema(
+const tokenModal = new mongoose.Schema(
   {
-    username: {
+    userId: {
       type: String,
       required: true,
     },
-    email: {
+    access_toekn: {
       type: String,
       required: true,
     },
-    password: {
+    refresh_token: {
       type: String,
       required: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("user", userSchema);
+module.exports = mongoose.model("token", tokenModal);
