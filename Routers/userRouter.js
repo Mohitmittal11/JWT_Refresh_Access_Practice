@@ -7,5 +7,6 @@ router.get("/getUser/:id", employeeAuth, userController.getUserData);
 
 router.post("/token", userController.refreshToken);
 router.post("/login", userController.userLogin);
+router.get('/logout', userController.logoutAdmin);
 
 module.exports = router;

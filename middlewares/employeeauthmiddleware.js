@@ -11,20 +11,17 @@ const { jwtDecode } = require("jwt-decode");
 // };
 
 const employeeAuth = async (req, res, next) => {
-  console.log("Employee authentication is ", req.params.id);
-  // console.log("Data is ", req.headers.auth);
-  // const expiryTime = jwtDecode(req.headers.auth).exp;
-
-  const isVarified = jwt.verify(req.headers.auth, process.env.JWT_SECRET_KEY);
-
-  if (
-    isVarified.email === "" ||
-    isVarified.email === undefined ||
-    isVarified.email === null
-  ) {
-    res.json({ message: "Unauthorized Access" });
-  } else {
+  try {
+    const isVerified = jwt.verify(req.headers.auth, process.env.JWT_SECRET_KEY);
     next();
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired" });
+    } else if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token" });
+    } else {
+      return res.status(500).json({ message: "Internal server error" });
+    }
   }
 };
 

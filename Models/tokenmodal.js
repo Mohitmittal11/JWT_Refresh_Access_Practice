@@ -5,7 +5,7 @@ const tokenModal = new mongoose.Schema(
       type: String,
       required: true,
     },
-    access_toekn: {
+    access_token: {
       type: String,
       required: true,
     },

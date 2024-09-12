@@ -116,7 +116,6 @@ const userLogin = async (req, res) => {
     res.json({ message: err.message });
   }
 };
-
 const getUserData = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -140,21 +139,23 @@ const getUserData = async (req, res) => {
 };
 const refreshToken = async (req, res) => {
   try {
-    const access_Token = await req?.headers.auth;
-    // console.log("Accesss token is ", access_Token.slice(13, access_Token.length));
-    if (access_Token) {
-      console.log("Refresh token is ", refreshToken);
-      const isVerified = jwt.verify(access_Token, process.env.JWT_SECRET_KEY);
+    const refresh_Token = await req?.headers.auth;
+    if (refresh_Token) {
+      console.log("Refresh token is ", refresh_Token);
+      const isVerified = jwt.verify(
+        refresh_Token,
+        process.env.JWT_SECRET_KEY_REFRESH
+      );
+      console.log("IS Verified Data is ", isVerified);
       if (isVerified && isVerified !== undefined && isVerified !== null) {
-        const accessToken = jwt.sign(
-          { _id: isVerified?._id },
-          process.env.JWT_SECRET_KEY,
-          {
-            expiresIn: "1h",
-          }
+        const newAccessToken = genrateAccessToken({ email: isVerified?.email });
+        console.log("New Access Token is", newAccessToken);
+        await tokenModal.updateOne(
+          { refresh_token: refresh_Token },
+          { access_token: newAccessToken }
         );
         return res
-          .cookie(access_Token, accessToken)
+          .cookie("access_Token", newAccessToken)
           .json({ message: "Token Changed successfully" });
       }
     }
@@ -163,9 +164,23 @@ const refreshToken = async (req, res) => {
   }
 };
 
+const logoutAdmin = async (req, res) => {
+  try {
+    // const access_token = req?.headers?.access_token;
+    // const refresh_token = req?.headers?.refresh_token;
+    res
+      .clearCookie("access_token")
+      .clearCookie("refresh_token")
+      .json({ message: "Cookies Deleted" });
+  } catch (error) {
+    res.json({ message: error.message });
+  }
+};
+
 module.exports = {
   addUserData,
   getUserData,
   refreshToken,
   userLogin,
+  logoutAdmin,
 };
